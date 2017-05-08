@@ -1242,6 +1242,11 @@ namespace Quartz.Impl.AdoJobStore
         {
             using (IDbCommand cmd = PrepareCommand(conn, ReplaceTablePrefix(SqlUpdateTriggerState)))
             {
+                //NH - do not update to ERROR state since this requires manual intervention to correct. make sure no perf effects from retry
+                if (state == StateError)
+                {
+                    return 1;
+                }
                 AddCommandParameter(cmd, "state", state);
                 AddCommandParameter(cmd, "triggerName", triggerKey.Name);
                 AddCommandParameter(cmd, "triggerGroup", triggerKey.Group);
